@@ -1,4 +1,4 @@
-Student_ID,Gender,Study_Hours_per_Week,Attendance_Rate,Past_Exam_Scores,Parental_Education_Level,Internet_Access_at_Home,Extracurricular_Activities,Final_Exam_Score,Pass_Fail
+Student_ID,Gender,Study_Hours_per_Week,Attendance_Rate,Midterm_Exam_Scores,Parental_Education_Level,Internet_Access_at_Home,Extracurricular_Activities,Final_Exam_Score,Pass_Fail
 S147,Male,31,68.26784098370288,86,High School,Yes,Yes,63,Pass
 S136,Male,16,78.22292712613206,73,PhD,No,No,50,Fail
 S209,Female,21,87.52509623826568,74,PhD,Yes,No,55,Fail
