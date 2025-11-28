@@ -3,7 +3,7 @@ import sagemaker
 from sagemaker.model import Model
 import os
 
-# -------------------
+# ----------------------
 # Config
 s3_model_uri = "s3://g30-student-performance-analysis/model-artifacts/model.joblib"
 endpoint_name = "student-performance-prod"
