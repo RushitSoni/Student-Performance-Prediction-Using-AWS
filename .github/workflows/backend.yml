@@ -6,6 +6,11 @@ on:
       - 'backend/**'
   workflow_dispatch:
 
+env:
+  LAMBDA_NAME: StudentPredictionLambda
+  LAMBDA_ROLE_ARN: arn:aws:iam::027419661883:role/LambdaSageMakerDynamoRole
+  AWS_REGION: ap-southeast-1
+
 jobs:
   deploy-lambda:
     runs-on: ubuntu-latest
@@ -34,10 +39,32 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-southeast-1
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Deploy Lambda
+      - name: Check if Lambda exists
+        id: check_lambda
+        run: |
+          set +e
+          aws lambda get-function --function-name $LAMBDA_NAME
+          if [ $? -eq 0 ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Lambda if not exists
+        if: steps.check_lambda.outputs.exists == 'false'
+        run: |
+          aws lambda create-function \
+            --function-name $LAMBDA_NAME \
+            --runtime python3.10 \
+            --role $LAMBDA_ROLE_ARN \
+            --handler handler.lambda_handler \
+            --zip-file fileb://lambda_package.zip
+
+      - name: Update Lambda if exists
+        if: steps.check_lambda.outputs.exists == 'true'
         run: |
           aws lambda update-function-code \
-            --function-name YourLambdaFunctionName \
+            --function-name $LAMBDA_NAME \
             --zip-file fileb://lambda_package.zip
