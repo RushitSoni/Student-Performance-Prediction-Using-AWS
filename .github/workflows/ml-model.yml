@@ -50,6 +50,8 @@ jobs:
       # 7️⃣ Deploy if test passed
       - name: Deploy to SageMaker
         if: env.TEST_RESULT == 'PASS'
+        env:
+          SAGEMAKER_ROLE_ARN: ${{ secrets.SAGEMAKER_ROLE_ARN }}
         run: |
           # Upload model to S3
           aws s3 cp ml_model/model/ s3://g30-student-performance-analysis/model/ --recursive
