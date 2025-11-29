@@ -72,7 +72,7 @@ def train_and_save_model():
     s3 = boto3.client("s3")
 
     print(f"📤 Uploading model to s3://{bucket_name}/{s3_key} ...")
-    s3.upload_file(local_model_path, bucket_name, s3_key)
+    #s3.upload_file(local_model_path, bucket_name, s3_key)
     print(f"🎉 Model uploaded successfully to s3://{bucket_name}/{s3_key}")
 
 if __name__ == "__main__":
