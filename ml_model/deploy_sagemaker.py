@@ -1,8 +1,8 @@
 import boto3
 import time
 import os
-from sagemaker import image_uris
-image_uris.retrieve(framework='sklearn',region='ap-southeast-1',version='0.23-1',image_scope='training')
+# from sagemaker import image_uris
+# image_uris.retrieve(framework='sklearn',region='ap-southeast-1',version='0.23-1',image_scope='training')
 
 # --- CONFIGURATION ---
 s3_bucket = "g30-student-performance-analysis"       # Your S3 bucket
