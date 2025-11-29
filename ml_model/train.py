@@ -66,13 +66,13 @@ def train_and_save_model():
     result = subprocess.run(command, capture_output=True, text=True)
 
     bucket_name = "g30-student-performance-analysis"         # Replace with your bucket
-    s3_key = "model-artifacts/model.tar.gz"        # Path inside bucket
+    s3_key = "model-artifacts/model.joblib"        # Path inside bucket
 
     #s3 = boto3.client("s3")
     s3 = boto3.client("s3")
 
     print(f"📤 Uploading model to s3://{bucket_name}/{s3_key} ...")
-    #s3.upload_file(local_model_path, bucket_name, s3_key)
+    s3.upload_file(local_model_path, bucket_name, s3_key)
     print(f"🎉 Model uploaded successfully to s3://{bucket_name}/{s3_key}")
 
 if __name__ == "__main__":
