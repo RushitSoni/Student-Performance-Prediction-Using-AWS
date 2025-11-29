@@ -46,6 +46,12 @@ jobs:
           python ml_model/test_model.py > result.txt
           TEST_RESULT=$(tail -n 1 result.txt)
           echo "TEST_RESULT=$TEST_RESULT" >> $GITHUB_ENV
+      
+      - name: Install/Upgrade SageMaker SDK
+        run: |
+          pip uninstall -y sagemaker sagemaker-python-sdk || true
+          pip install --upgrade --no-cache-dir sagemaker>=2.200.0
+
 
       # 7️⃣ Deploy if test passed
       - name: Deploy to SageMaker
