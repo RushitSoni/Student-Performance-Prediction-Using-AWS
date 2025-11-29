@@ -22,5 +22,5 @@ jobs:
       - name: Install dependencies
         run: pip install -r frontend/requirements.txt
 
-      - name: Deploy Streamlit
-        run: echo "Deploy Streamlit app (use Streamlit Cloud/Docker/etc.)"
+      # - name: Deploy Streamlit
+      #   run: echo "Deploy Streamlit app (use Streamlit Cloud/Docker/etc.)"
