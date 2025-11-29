@@ -2,127 +2,116 @@ import json
 import boto3
 from decimal import Decimal
 
-# DynamoDB setup
-dynamodb = boto3.resource('dynamodb', region_name='ap-southeast-1')
-table = dynamodb.Table('StudentPerformancePredictions')
+# ----------------------
+# AWS Clients
+# ----------------------
+dynamodb = boto3.resource("dynamodb", region_name="ap-southeast-1")
+table = dynamodb.Table("StudentPerformancePredictions")
 
-# SageMaker runtime client
-sagemaker_runtime = boto3.client('sagemaker-runtime', region_name='ap-southeast-1')
-SAGEMAKER_ENDPOINT = "student-performance-model-6-endpoint"  # replace with your actual endpoint
+runtime = boto3.client("sagemaker-runtime", region_name="ap-southeast-1")
+sagemaker_endpoint = "student-performance-model-6-endpoint"  # Replace with your endpoint
 
+# Helper: Convert floats to Decimal for DynamoDB
+def convert_to_decimal(item):
+    for k, v in item.items():
+        if isinstance(v, float):
+            item[k] = Decimal(str(v))
+    return item
 
-def predict_final_score_sagemaker(student_data):
-    # Convert data to JSON string
-    payload = json.dumps(student_data)
-    
-    response = sagemaker_runtime.invoke_endpoint(
-        EndpointName=SAGEMAKER_ENDPOINT,
-        ContentType='application/json',
-        Body=payload
-    )
-    
-    result = json.loads(response['Body'].read().decode())
-    
-    # Expecting result like: {"prediction": [63.41]}
-    prediction = result.get('prediction', [None])[0]
-    if prediction is None:
-        raise ValueError("SageMaker did not return a prediction")
-    
-    return float(prediction)
-
-
+# Lambda handler
 def lambda_handler(event, context):
     try:
-        operation = event.get('operation')
-        data = event.get('data', {})
+        operation = event.get("operation")
+        data = event.get("data")
 
-        if not operation or not isinstance(data, dict):
-            return {
-                'statusCode': 400,
-                'body': json.dumps({'error': 'Invalid input'})
-            }
+        if operation not in ["CREATE", "READ", "UPDATE", "DELETE"]:
+            return {"success": False, "error": f"Unsupported operation: {operation}"}
 
+        # ----------------------
         # CREATE
-        if operation == 'CREATE':
-            predicted_score = predict_final_score_sagemaker(data)
+        # ----------------------
+        if operation == "CREATE":
+            # Call SageMaker for prediction
+            payload = json.dumps([data])  # list of dicts
+            sm_response = runtime.invoke_endpoint(
+                EndpointName=sagemaker_endpoint,
+                ContentType="application/json",
+                Body=payload
+            )
+            sm_result = json.loads(sm_response["Body"].read().decode("utf-8"))
+            prediction = sm_result.get("prediction", [None])[0]
 
-            item = {
-                'StudentID': data['StudentID'],
-                'Gender': data['Gender'],
-                'Study_Hours_per_Week': Decimal(str(data['Study_Hours_per_Week'])),
-                'Attendance_Rate': Decimal(str(data['Attendance_Rate'])),
-                'Midterm_Exam_Scores': Decimal(str(data['Midterm_Exam_Scores'])),
-                'Parental_Education_Level': data['Parental_Education_Level'],
-                'Internet_Access_at_Home': data['Internet_Access_at_Home'],
-                'Extracurricular_Activities': data['Extracurricular_Activities'],
-                'Predicted_Final_Score': Decimal(str(predicted_score))
-            }
-
+            # Save to DynamoDB
+            item = data.copy()
+            if prediction is not None:
+                item["Predicted_Final_Score"] = Decimal(str(prediction))
+            item = convert_to_decimal(item)
             table.put_item(Item=item)
 
-            return {
-                'statusCode': 200,
-                'body': json.dumps({'success': True, 'prediction': [predicted_score]})
-            }
+            return {"success": True, "message": "Student created", "prediction": [prediction]}
 
+        # ----------------------
         # READ
-        elif operation == 'READ':
-            if 'StudentID' in data:
-                response = table.get_item(Key={'StudentID': data['StudentID']})
-                items = [response['Item']] if 'Item' in response else []
+        # ----------------------
+        elif operation == "READ":
+            if "StudentID" in data:
+                response = table.get_item(Key={"StudentID": data["StudentID"]})
+                items = [response["Item"]] if "Item" in response else []
             else:
                 response = table.scan()
-                items = response.get('Items', [])
+                items = response.get("Items", [])
 
+            # Convert Decimals to float for JSON serialization
             for item in items:
                 for k, v in item.items():
                     if isinstance(v, Decimal):
                         item[k] = float(v)
+            return {"success": True, "data": items}
 
-            return {
-                'statusCode': 200,
-                'body': json.dumps({'success': True, 'data': items})
-            }
-
+        # ----------------------
         # UPDATE
-        elif operation == 'UPDATE':
-            predicted_score = predict_final_score_sagemaker(data)
+        # ----------------------
+        elif operation == "UPDATE":
+            student_id = data.get("StudentID")
+            if not student_id:
+                return {"success": False, "error": "StudentID is required for update"}
 
-            update_expression = "SET " + ", ".join(
-                [f"{k}=:{k}" for k in data if k != 'StudentID'] + ["Predicted_Final_Score=:Predicted_Final_Score"]
+            # Call SageMaker for prediction
+            payload = json.dumps([data])
+            sm_response = runtime.invoke_endpoint(
+                EndpointName=sagemaker_endpoint,
+                ContentType="application/json",
+                Body=payload
             )
+            sm_result = json.loads(sm_response["Body"].read().decode("utf-8"))
+            prediction = sm_result.get("prediction", [None])[0]
 
-            expression_values = {f":{k}": Decimal(str(v)) if isinstance(v, (int, float)) else v
-                                 for k, v in data.items() if k != 'StudentID'}
-            expression_values[":Predicted_Final_Score"] = Decimal(str(predicted_score))
+            # Update DynamoDB
+            update_expr = "SET " + ", ".join([f"{k}=:{k}" for k in data if k != "StudentID"])
+            expr_values = {f":{k}": Decimal(str(v)) if isinstance(v, float) else v
+                           for k, v in data.items() if k != "StudentID"}
+            if prediction is not None:
+                update_expr += ", Predicted_Final_Score=:Predicted_Final_Score"
+                expr_values[":Predicted_Final_Score"] = Decimal(str(prediction))
 
             table.update_item(
-                Key={'StudentID': data['StudentID']},
-                UpdateExpression=update_expression,
-                ExpressionAttributeValues=expression_values
+                Key={"StudentID": student_id},
+                UpdateExpression=update_expr,
+                ExpressionAttributeValues=expr_values
             )
 
-            return {
-                'statusCode': 200,
-                'body': json.dumps({'success': True, 'prediction': [predicted_score]})
-            }
+            return {"success": True, "message": "Student updated", "prediction": [prediction]}
 
+        # ----------------------
         # DELETE
-        elif operation == 'DELETE':
-            table.delete_item(Key={'StudentID': data['StudentID']})
-            return {
-                'statusCode': 200,
-                'body': json.dumps({'success': True, 'message': 'Student deleted'})
-            }
+        # ----------------------
+        elif operation == "DELETE":
+            student_id = data.get("StudentID")
+            if not student_id:
+                return {"success": False, "error": "StudentID is required for delete"}
 
-        else:
-            return {
-                'statusCode': 400,
-                'body': json.dumps({'error': f'Unknown operation {operation}'})
-            }
+            table.delete_item(Key={"StudentID": student_id})
+            return {"success": True, "message": "Student deleted"}
 
     except Exception as e:
-        return {
-            'statusCode': 500,
-            'body': json.dumps({'error': str(e), 'prediction': [None]})
-        }
+        return {"success": False, "error": str(e), "prediction": [None]}
