@@ -1,6 +1,8 @@
 import boto3
 import time
 import os
+from sagemaker import image_uris
+image_uris.retrieve(framework='sklearn',region='ap-southeast-1',version='0.23-1',image_scope='training')
 
 # --- CONFIGURATION ---
 s3_bucket = "g30-student-performance-analysis"       # Your S3 bucket
@@ -19,7 +21,7 @@ try:
     sm_client.create_model(
         ModelName=model_name,
         PrimaryContainer={
-            "Image": "683313688378.dkr.ecr.ap-southeast-1.amazonaws.com/sagemaker-scikit-learn:2.0-1-cpu-py3",
+            "Image": "121021644041.dkr.ecr.ap-southeast-1.amazonaws.com/sagemaker-scikit-learn",
             "ModelDataUrl": f"s3://{s3_bucket}/{s3_model_key}"
         },
         ExecutionRoleArn=role_arn
