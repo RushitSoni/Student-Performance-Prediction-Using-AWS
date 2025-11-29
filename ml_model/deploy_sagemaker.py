@@ -94,7 +94,7 @@ s3_bucket = "g30-student-performance-analysis"
 s3_model_key = "model-artifacts/model.tar.gz"
 model_s3_uri = f"s3://{s3_bucket}/{s3_model_key}"
 
-model_name = "student-performance-model-5"
+model_name = "student-performance-model-6"
 endpoint_name = f"{model_name}-endpoint"
 
 role_arn = os.environ.get("SAGEMAKER_ROLE_ARN")   # MUST be set in your env
