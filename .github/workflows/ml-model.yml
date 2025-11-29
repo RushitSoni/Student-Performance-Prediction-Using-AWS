@@ -52,7 +52,7 @@ jobs:
         if: env.TEST_RESULT == 'PASS'
         run: |
           # Upload model to S3
-          aws s3 cp ml_model/model/ s3://your-bucket-name/model/ --recursive
+          aws s3 cp ml_model/model/ s3://g30-student-performance-analysis/model/ --recursive
           # Deploy to SageMaker
           python ml_model/deploy_sagemaker.py
 
