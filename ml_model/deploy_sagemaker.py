@@ -19,7 +19,7 @@ try:
     sm_client.create_model(
         ModelName=model_name,
         PrimaryContainer={
-            "Image": "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-scikit-learn:2.0-1-cpu-py3",
+            "Image": "683313688378.dkr.ecr.ap-southeast-1.amazonaws.com/sagemaker-scikit-learn:2.0-1-cpu-py3",
             "ModelDataUrl": f"s3://{s3_bucket}/{s3_model_key}"
         },
         ExecutionRoleArn=role_arn
