@@ -52,7 +52,7 @@ def train_and_save_model():
     print(f"💾 Model saved locally at {local_model_path}")
 
     # --- 5. Upload model to S3 ---
-    bucket_name = "g30-student-performance-analysis "         # Replace with your bucket
+    bucket_name = "g30-student-performance-analysis"         # Replace with your bucket
     s3_key = "model-artifacts/model.joblib"        # Path inside bucket
 
     s3 = boto3.client("s3")
