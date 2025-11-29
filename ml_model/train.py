@@ -53,10 +53,17 @@ def train_and_save_model():
 
     # --- 5. Upload model to S3 ---
 
-    import tarfile
+    # import tarfile
 
-    with tarfile.open("model.tar.gz", "w:gz") as tar:
-        tar.add(local_model_path, arcname="model.joblib")
+    # with tarfile.open("model.tar.gz", "w:gz") as tar:
+    #     tar.add(local_model_path, arcname="model.joblib")
+    import subprocess
+
+    # command = ["tar", "-czvf", "model.tar.gz", local_model_path]
+    command = ["tar", "-czvf", "model.tar.gz", "-C", "ml_model/model", "model.joblib"]
+
+
+    result = subprocess.run(command, capture_output=True, text=True)
 
     bucket_name = "g30-student-performance-analysis"         # Replace with your bucket
     s3_key = "model-artifacts/model.tar.gz"        # Path inside bucket
