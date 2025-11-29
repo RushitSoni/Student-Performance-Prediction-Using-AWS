@@ -46,7 +46,7 @@ def train_and_save_model():
     print("✅ Model training complete")
 
     # --- 4. Save model locally ---
-    local_model_path = "ML_model/model/model.joblib"
+    local_model_path = "ml_model/model/model.joblib"
     os.makedirs(os.path.dirname(local_model_path), exist_ok=True)
     joblib.dump(model_pipeline, local_model_path)
     print(f"💾 Model saved locally at {local_model_path}")
