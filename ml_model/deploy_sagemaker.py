@@ -1,6 +1,9 @@
 import boto3
 import time
 import os
+import sagemaker
+print(sagemaker.__version__)
+
 from sagemaker import image_uris
 container=image_uris.retrieve(framework='sklearn',region='ap-southeast-1')
 print(container)
