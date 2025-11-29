@@ -11,7 +11,7 @@ def train_and_save_model():
     print("🚀 Starting model training")
 
     # --- 1. Load CSV from local repo ---
-    local_csv_path = "ML_model/data/student_performance.csv"
+    local_csv_path = "ml_model/data/student_performance.csv"
     if not os.path.exists(local_csv_path):
         raise FileNotFoundError(f"{local_csv_path} not found!")
     
