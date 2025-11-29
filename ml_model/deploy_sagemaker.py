@@ -110,7 +110,7 @@ model = SKLearnModel(
     model_data=model_s3_uri,
     role=role_arn,
     entry_point="ml_model/inference.py", # ⭐ REQUIRED
-    framework_version="0.23-1",        # Must match your sklearn version
+    framework_version="1.3-1",        # Must match your sklearn version
     sagemaker_session=sagemaker.Session()
 )
 
