@@ -13,7 +13,7 @@ print(container)
 
 # --- CONFIGURATION ---
 s3_bucket = "g30-student-performance-analysis"       # Your S3 bucket
-s3_model_key = "model-artifacts/model.joblib"                  # Path to your model in S3
+s3_model_key = "model-artifacts/model.tar.gz"                  # Path to your model in S3
 model_name = "student-performance-model"            # SageMaker model name
 endpoint_config_name = f"{model_name}-config"
 endpoint_name = f"{model_name}-endpoint"
