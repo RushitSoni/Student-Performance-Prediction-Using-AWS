@@ -31,7 +31,7 @@ except sm_client.exceptions.ClientError as e:
     else:
         raise e
 
-# --- 2️⃣ Create endpoint configuration ---
+# --- 2️⃣ Create endpoint configuration --
 print(f"Creating endpoint configuration: {endpoint_config_name}...")
 try:
     sm_client.create_endpoint_config(
