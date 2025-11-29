@@ -56,12 +56,8 @@ def train_and_save_model():
     s3_key = "model-artifacts/model.joblib"        # Path inside bucket
 
     #s3 = boto3.client("s3")
-    s3 = boto3.client(
-    "s3",
-    aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
-    aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
-    region_name=os.environ.get("AWS_REGION")
-)
+    s3 = boto3.client("s3")
+
     print(f"📤 Uploading model to s3://{bucket_name}/{s3_key} ...")
     s3.upload_file(local_model_path, bucket_name, s3_key)
     print(f"🎉 Model uploaded successfully to s3://{bucket_name}/{s3_key}")

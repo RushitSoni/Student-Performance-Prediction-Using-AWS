@@ -27,33 +27,36 @@ jobs:
           pip install -r ml_model/requirements.txt
           pip install boto3 sagemaker pandas numpy scikit-learn
 
-      # 4️⃣ Train Model
+      # 4️⃣ Configure AWS credentials (for both training & deployment)
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # 5️⃣ Train Model
       - name: Train Model
         run: python ml_model/train.py
 
-      # 5️⃣ Run Test/Evaluation
+      # 6️⃣ Run Test/Evaluation
       - name: Test Model
         id: test_model
         run: |
           python ml_model/test_model.py > result.txt
-          # Assume test_model.py prints "PASS" if satisfactory
           TEST_RESULT=$(tail -n 1 result.txt)
           echo "TEST_RESULT=$TEST_RESULT" >> $GITHUB_ENV
 
-      # 6️⃣ Deploy if test passed
+      # 7️⃣ Deploy if test passed
       - name: Deploy to SageMaker
         if: env.TEST_RESULT == 'PASS'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
           # Upload model to S3
           aws s3 cp ml_model/model/ s3://your-bucket-name/model/ --recursive
           # Deploy to SageMaker
           python ml_model/deploy_sagemaker.py
 
-      # 7️⃣ Notify if test failed
+      # 8️⃣ Notify if test failed
       - name: Notify Failure
         if: env.TEST_RESULT != 'PASS'
         run: echo "Model test failed. Deployment skipped."
