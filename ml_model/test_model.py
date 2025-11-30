@@ -12,7 +12,7 @@ model = joblib.load(model_path)
 print(f"✅ Model loaded from {model_path}")
 
 # --- 2️⃣ Load test data ---
-test_csv_path = "ml_model/data/student_performance_test.csv"
+test_csv_path = "ml_model/data/test.csv"
 if not os.path.exists(test_csv_path):
     raise FileNotFoundError(f"{test_csv_path} not found!")
 
