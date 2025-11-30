@@ -9,7 +9,7 @@ import uuid
 # Page config
 st.set_page_config(page_title="Student Performance Prediction", layout="wide", initial_sidebar_state="collapsed")
 
-# AWS Clients 
+# AWS Clients ---
 def get_aws_clients():
     dynamodb = boto3.resource("dynamodb", region_name="ap-southeast-1")
     table = dynamodb.Table("StudentPerformancePredictions")

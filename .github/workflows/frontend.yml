@@ -6,25 +6,6 @@ on:
       - 'frontend/**'
   workflow_dispatch:
 
-# jobs:
-#   deploy-frontend:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout repo
-#         uses: actions/checkout@v3
-
-#       - name: Setup Python
-#         uses: actions/setup-python@v4
-#         with:
-#           python-version: '3.10'
-
-#       - name: Install dependencies
-#         run: pip install -r frontend/requirements.txt
-
-#       # - name: Deploy Streamlit
-#       #   run: echo "Deploy Streamlit app (use Streamlit Cloud/Docker/etc.)"
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -41,42 +22,42 @@ jobs:
     - name: Install dependencies
       run: pip install -r frontend/requirements.txt
         
-    #  TEST 1: Syntax Check
-    - name:  Test 1 - Syntax
+    # TEST 1: Syntax Check
+    - name: Test 1 - Syntax
       run: python -m py_compile frontend/app.py
       
-    #  TEST 2: AWS DynamoDB Table
-    - name:  Test 2 - DynamoDB
+    # TEST 2: AWS DynamoDB Table
+    - name: Test 2 - DynamoDB
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ap-southeast-1
       run: |
-        python -c "
+        python - << 'EOF'
         import boto3
+
         dynamodb = boto3.client('dynamodb')
         dynamodb.describe_table(TableName='StudentPerformancePredictions')
         print('✅ DynamoDB Table OK!')
-        "
+        EOF
         
-    #  TEST 3: SageMaker Endpoint
-        
-    - name:  Test 3 - SageMaker
+    # TEST 3: AWS SageMaker Endpoint
+    - name: Test 3 - SageMaker
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ap-southeast-1
       run: |
-        python -c "
-          import boto3
-          sm = boto3.client('sagemaker')
-          sm.describe_endpoint(EndpointName='student-performance-model-6-endpoint')
-          print('✅ SageMaker Endpoint OK!')
-          "
+        python - << 'EOF'
+        import boto3
 
+        sm = boto3.client('sagemaker')
+        sm.describe_endpoint(EndpointName='student-performance-model-6-endpoint')
+        print('✅ SageMaker Endpoint OK!')
+        EOF
         
-    #  TEST 4: App Launches
-    - name:  Test 4 - Streamlit App
+    # TEST 4: Streamlit App Launch
+    - name: Test 4 - Streamlit App
       run: |
         streamlit run frontend/app.py --server.headless=true --server.port=8501 --server.address=0.0.0.0 &
         sleep 10
@@ -84,20 +65,19 @@ jobs:
         pkill -f streamlit
         echo '✅ Streamlit App OK!'
         
-    #  TEST 5: Linting
-    - name:  Test 5 - Code Quality
+    # TEST 5: Linting
+    - name: Test 5 - Code Quality
       run: |
         pip install ruff
         ruff check frontend/app.py || echo "⚠️ Linting warnings OK"
 
   deploy:
     needs: test
-    if: success()        # Only run if test job succeeded
+    if: success()        # Only deploy when all tests pass
     runs-on: ubuntu-latest
 
     steps:
       - name: Trigger Render Deploy
-        run: |
-          curl "$RENDER_DEPLOY_HOOK"
+        run: curl "$RENDER_DEPLOY_HOOK"
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
