@@ -17,7 +17,7 @@ def get_aws_clients():
     return table, runtime
 
 table, runtime = get_aws_clients()
-sagemaker_endpoint = "student-performance-model-6-endpoint"
+sagemaker_endpoint = "student-performance-model-endpoint"
 
 # Helper Functions - NO CACHE
 def convert_to_decimal(item):

@@ -52,7 +52,7 @@ jobs:
         import boto3
 
         sm = boto3.client('sagemaker')
-        sm.describe_endpoint(EndpointName='student-performance-model-6-endpoint')
+        sm.describe_endpoint(EndpointName='student-performance-model-endpoint')
         print('✅ SageMaker Endpoint OK!')
         EOF
         

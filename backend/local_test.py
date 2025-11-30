@@ -31,7 +31,7 @@ payload = json.dumps(sample_input)
 
 # Invoke endpoint
 response = sm_client.invoke_endpoint(
-    EndpointName='student-performance-model-6-endpoint',  # your SageMaker endpoint
+    EndpointName='student-performance-model-endpoint',  # your SageMaker endpoint
     ContentType="application/json",
     Body=payload
 )
