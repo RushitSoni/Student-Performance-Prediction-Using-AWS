@@ -141,6 +141,16 @@ model = SKLearnModel(
 
 print("✅ SKLearnModel created.")
 
+# Create the model in SageMaker
+try:
+    model.create()
+    print(f"✅ Model '{model_name}' created in SageMaker.")
+except sm_client.exceptions.ClientError as e:
+    if "AlreadyExists" in str(e):
+        print(f"⚠️ Model '{model_name}' already exists, skipping creation.")
+    else:
+        raise e
+
 # ----------------------------
 # CHECK IF ENDPOINT EXISTS
 # ----------------------------
