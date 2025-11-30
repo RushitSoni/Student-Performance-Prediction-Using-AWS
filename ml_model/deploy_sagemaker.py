@@ -173,7 +173,7 @@ else:
     client = boto3.client('sagemaker')
     response = client.update_endpoint(
     EndpointName=endpoint_name,
-    EndpointConfigName= endpoint_config_name
+    EndpointConfigName= model_name
     )
     print(response)
     # predictor = model.deploy(
