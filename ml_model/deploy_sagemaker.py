@@ -169,12 +169,29 @@ if not endpoint_exists:
     print(f"🎉 New endpoint '{endpoint_name}' created with model '{model_name}'!")
 else:
     # Update existing endpoint with new model
-  
-    client = boto3.client('sagemaker')
-    response = client.update_endpoint(
-    EndpointName=endpoint_name,
-    EndpointConfigName= model_name
+    sm_client.create_endpoint_config(
+    EndpointConfigName=endpoint_config_name,
+    ProductionVariants=[
+        {
+            "VariantName": "AllTraffic",
+            "ModelName": model_name,
+            "InitialInstanceCount": 1,
+            "InstanceType": "ml.t2.medium",
+            "InitialVariantWeight": 1,
+        }
+    ],
     )
+
+    response = sm_client.update_endpoint(
+        EndpointName=endpoint_name,
+        EndpointConfigName=endpoint_config_name
+    )
+  
+    # client = boto3.client('sagemaker')
+    # response = client.update_endpoint(
+    # EndpointName=endpoint_name,
+    # EndpointConfigName= endpoint_config_name
+    # )
     print(response)
     # predictor = model.deploy(
     #     initial_instance_count=1,
