@@ -102,7 +102,7 @@ def lambda_handler(event, context):
 
             return {"success": True, "message": "Student updated", "prediction": [prediction]}
 
-        # ----------------------
+        # -----------------
         # DELETE
         # ----------------------
         elif operation == "DELETE":
