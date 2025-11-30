@@ -1,0 +1,27 @@
+Student_ID,Gender,Study_Hours_per_Week,Attendance_Rate,Midterm_Exam_Scores,Parental_Education_Level,Internet_Access_at_Home,Extracurricular_Activities,Final_Exam_Score,Pass_Fail
+S334,Male,18,89.98910110371347,68,Bachelors,No,No,56,Fail
+S098,Female,25,50.129751219182324,55,Masters,Yes,Yes,50,Fail
+S135,Male,38,79.32677173303796,66,High School,Yes,Yes,57,Fail
+S355,Female,28,90.03748857430605,78,Masters,Yes,No,67,Pass
+S212,Male,10,59.320249339407205,76,Bachelors,No,Yes,50,Fail
+S303,Male,25,80.18607658650694,83,High School,No,No,67,Pass
+S172,Male,32,85.54762394183741,97,Bachelors,No,Yes,64,Pass
+S134,Male,25,77.88711329752186,67,High School,No,Yes,50,Fail
+S483,Male,24,97.90853965019652,62,High School,Yes,Yes,53,Fail
+S176,Female,14,85.36150478222223,86,High School,Yes,No,57,Fail
+S307,Female,21,96.14801158992424,84,Bachelors,Yes,No,65,Pass
+S004,Male,10,91.45821103532572,100,High School,No,No,59,Fail
+S109,Female,35,53.11706812556207,69,PhD,Yes,No,54,Fail
+S198,Female,33,87.2987262774359,73,Masters,No,Yes,72,Pass
+S407,Female,15,75.62288279409609,100,Bachelors,No,Yes,54,Fail
+S183,Female,35,68.46152407549481,99,PhD,Yes,No,67,Pass
+S472,Female,37,50.116969531288916,71,PhD,Yes,No,55,Fail
+S442,Female,19,54.516848028880396,64,Bachelors,No,No,50,Fail
+S149,Male,38,92.5408758918073,60,PhD,Yes,Yes,64,Pass
+S118,Female,21,69.85819162520413,90,Masters,Yes,No,50,Fail
+S358,Female,22,93.34968800057618,76,Bachelors,No,No,60,Pass
+S492,Male,14,84.65876057284623,78,PhD,Yes,No,50,Fail
+S301,Male,35,60.27899041878187,83,Masters,No,No,62,Pass
+S473,Male,25,98.38496941035433,75,Bachelors,Yes,No,57,Fail
+S307,Female,21,96.14801158992424,84,Bachelors,Yes,No,65,Pass
+S046,Female,22,80.40439247709426,93,Bachelors,Yes,No,55,Fail

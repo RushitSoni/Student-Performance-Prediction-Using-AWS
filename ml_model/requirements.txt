@@ -3,3 +3,4 @@ pandas>=2.0.0
 numpy>=1.25.0
 joblib
 sagemaker==2.203.0
+boto3

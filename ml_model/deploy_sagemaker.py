@@ -87,6 +87,8 @@
 
 import os
 import sagemaker
+import boto3
+import time
 from sagemaker.sklearn.model import SKLearnModel
 
 # --- CONFIG ---
@@ -94,8 +96,14 @@ s3_bucket = "g30-student-performance-analysis"
 s3_model_key = "model-artifacts/model.tar.gz"
 model_s3_uri = f"s3://{s3_bucket}/{s3_model_key}"
 
-model_name = "student-performance-model-6"
-endpoint_name = f"{model_name}-endpoint"
+# Fixed endpoint name
+endpoint_name = "student-performance-model-endpoint"
+
+# Unique model name for each deploy (timestamp-based)
+timestamp = int(time.time())
+model_name = f"student-performance-model-{timestamp}"
+
+
 
 role_arn = os.environ.get("SAGEMAKER_ROLE_ARN")   # MUST be set in your env
 region = os.environ.get("AWS_REGION", "ap-southeast-1")
@@ -103,27 +111,81 @@ region = os.environ.get("AWS_REGION", "ap-southeast-1")
 print("Using role:", role_arn)
 print("Using region:", region)
 print("Model S3 URI:", model_s3_uri)
+print(f"Endpoint name (fixed): {endpoint_name}")
+print(f"Model name (unique): {model_name}")
+
+# ----------------------------
+# INIT CLIENTS
+# ----------------------------
+sm_client = boto3.client("sagemaker", region_name=region)
+sess = sagemaker.Session()
+
 
 # --- Create SKLearn Model ---
 print("\n📌 Creating SKLearnModel object...")
+# model = SKLearnModel(
+#     model_data=model_s3_uri,
+#     role=role_arn,
+#     entry_point="ml_model/inference.py", # ⭐ REQUIRED
+#     framework_version="1.2-1",        # Must match your sklearn version
+#     sagemaker_session=sagemaker.Session()
+# )
 model = SKLearnModel(
     model_data=model_s3_uri,
     role=role_arn,
-    entry_point="ml_model/inference.py", # ⭐ REQUIRED
-    framework_version="1.2-1",        # Must match your sklearn version
-    sagemaker_session=sagemaker.Session()
+    entry_point="ml_model/inference.py",   # Required inference script
+    framework_version="1.2-1",             # Must match sklearn version
+    sagemaker_session=sess,
+    name=model_name
 )
 
 print("✅ SKLearnModel created.")
 
-# --- Deploy the model ---
-print(f"\n🚀 Deploying endpoint: {endpoint_name} ...")
-predictor = model.deploy(
-    instance_type="ml.t2.medium",
-    initial_instance_count=1,
-    endpoint_name=endpoint_name
-)
+# ----------------------------
+# CHECK IF ENDPOINT EXISTS
+# ----------------------------
+try:
+    sm_client.describe_endpoint(EndpointName=endpoint_name)
+    endpoint_exists = True
+    print(f"⚠️ Endpoint '{endpoint_name}' already exists. Will update it with new model...")
+except sm_client.exceptions.ClientError as e:
+    if "Could not find endpoint" in str(e) or "ValidationException" in str(e):
+        endpoint_exists = False
+        print(f"✅ Endpoint '{endpoint_name}' does not exist. Will create a new one.")
+    else:
+        raise e
 
-print(f"\n🎉 Endpoint deployed successfully!")
-print(f"Endpoint name: {endpoint_name}")
+
+# ----------------------------
+# DEPLOY / UPDATE ENDPOINT
+# ----------------------------
+if not endpoint_exists:
+    # Create new endpoint
+    predictor = model.deploy(
+        initial_instance_count=1,
+        instance_type="ml.t2.medium",
+        endpoint_name=endpoint_name
+    )
+    print(f"🎉 New endpoint '{endpoint_name}' created with model '{model_name}'!")
+else:
+    # Update existing endpoint with new model
+    predictor = model.deploy(
+        initial_instance_count=1,
+        instance_type="ml.t2.medium",
+        endpoint_name=endpoint_name,
+        update_endpoint=True
+    )
+    print(f"🔄 Endpoint '{endpoint_name}' updated successfully with model '{model_name}'!")
+
+    
+# --- Deploy the model ---
+# print(f"\n🚀 Deploying endpoint: {endpoint_name} ...")
+# predictor = model.deploy(
+#     instance_type="ml.t2.medium",
+#     initial_instance_count=1,
+#     endpoint_name=endpoint_name
+# )
+
+# print(f"\n🎉 Endpoint deployed successfully!")
+# print(f"Endpoint name: {endpoint_name}")
 

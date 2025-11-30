@@ -51,29 +51,54 @@ def train_and_save_model():
     joblib.dump(model_pipeline, local_model_path)
     print(f"💾 Model saved locally at {local_model_path}")
 
+
+    import subprocess
+    import os
+
+    model_dir = "ml_model/model"
+    os.makedirs(model_dir, exist_ok=True)
+    model_path = os.path.join(model_dir, "model.joblib")
+    tar_path = os.path.join(model_dir, "model.tar.gz")
+
+    # Create tar.gz using Linux tar command
+    command = ["tar", "-czvf", tar_path, "-C", model_dir, "model.joblib"]
+    result = subprocess.run(command, capture_output=True, text=True)
+
+    if result.returncode == 0:
+        print(f"📦 Model tarball created at {tar_path}")
+    else:
+        print("❌ Failed to create tarball")
+        print(result.stderr)
+        raise Exception("tar command failed")
+
+
     # --- 5. Upload model to S3 ---
 
     # import tarfile
 
     # with tarfile.open("model.tar.gz", "w:gz") as tar:
     #     tar.add(local_model_path, arcname="model.joblib")
-    import subprocess
+    # import subprocess
 
-    # command = ["tar", "-czvf", "model.tar.gz", local_model_path]
-    command = ["tar", "-czvf", "model.tar.gz", "-C", "ml_model/model", "model.joblib"]
+    # # command = ["tar", "-czvf", "model.tar.gz", local_model_path]
+    # command = ["tar", "-czvf", "model.tar.gz", "-C", "ml_model/model", "model.joblib"]
 
 
-    result = subprocess.run(command, capture_output=True, text=True)
+    # result = subprocess.run(command, capture_output=True, text=True)
 
     bucket_name = "g30-student-performance-analysis"         # Replace with your bucket
-    s3_key = "model-artifacts/model.joblib"        # Path inside bucket
+    s3_key = "model-artifacts/model.tar.gz"       # Path inside bucket
 
     #s3 = boto3.client("s3")
     s3 = boto3.client("s3")
 
-    print(f"📤 Uploading model to s3://{bucket_name}/{s3_key} ...")
-    #s3.upload_file(local_model_path, bucket_name, s3_key)
+    print(f"📤 Uploading {tar_path} to s3://{bucket_name}/{s3_key} ...")
+    s3.upload_file(tar_path, bucket_name, s3_key)
     print(f"🎉 Model uploaded successfully to s3://{bucket_name}/{s3_key}")
+
+    # print(f"📤 Uploading model to s3://{bucket_name}/{s3_key} ...")
+    # #s3.upload_file(local_model_path, bucket_name, s3_key)
+    # print(f"🎉 Model uploaded successfully to s3://{bucket_name}/{s3_key}")
 
 if __name__ == "__main__":
     train_and_save_model()
