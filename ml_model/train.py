@@ -6,6 +6,8 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.pipeline import Pipeline
 import os
+import subprocess
+  
 
 def train_and_save_model():
     print("🚀 Starting model training")
@@ -52,8 +54,7 @@ def train_and_save_model():
     print(f"💾 Model saved locally at {local_model_path}")
 
 
-    import subprocess
-    import os
+  
 
     model_dir = "ml_model/model"
     os.makedirs(model_dir, exist_ok=True)
