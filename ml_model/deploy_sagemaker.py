@@ -188,4 +188,4 @@ else:
 
 # print(f"\n🎉 Endpoint deployed successfully!")
 # print(f"Endpoint name: {endpoint_name}")
-####oooooo
+####o
