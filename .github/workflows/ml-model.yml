@@ -9,6 +9,7 @@ on:
 jobs:
   train:
     runs-on: ubuntu-latest
+    
 
     steps:
       # 1️⃣ Checkout repo
@@ -46,6 +47,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: train
+    outputs:
+      test_result: ${{ steps.set_output.outputs.TEST_RESULT }}
+    
 
     steps:
       - name: Checkout repo
@@ -62,11 +66,12 @@ jobs:
           pip install pandas numpy scikit-learn joblib
 
       - name: Run Test / Evaluate Model
-        id: test_model
+        id: set_output
         run: |
           python ml_model/test_model.py > result.txt
           TEST_RESULT=$(tail -n 1 result.txt)
-          echo "TEST_RESULT=$TEST_RESULT" >> $GITHUB_ENV
+          echo "TEST_RESULT=$TEST_RESULT"
+          echo "::set-output name=TEST_RESULT::$TEST_RESULT"
 
   
   # ----------------------------
@@ -75,7 +80,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: test
-    if: env.TEST_RESULT == 'PASS'
+    if: ${{ needs.test.outputs.test_result == 'PASS' }}
 
     steps:
       - name: Checkout repo
@@ -111,7 +116,7 @@ jobs:
   notify_failure:
     runs-on: ubuntu-latest
     needs: test
-    if: env.TEST_RESULT != 'PASS'
+    if: ${{ needs.test.outputs.test_result != 'PASS' }}
     steps:
       - name: Notify Failure
         run: echo "❌ Model test failed. Deployment skipped."
