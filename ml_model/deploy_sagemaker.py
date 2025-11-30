@@ -164,19 +164,25 @@ if not endpoint_exists:
     predictor = model.deploy(
         initial_instance_count=1,
         instance_type="ml.t2.medium",
-        endpoint_name=endpoint_name,
-        endpoint_config_name=endpoint_config_name
+        endpoint_name=endpoint_name
     )
     print(f"🎉 New endpoint '{endpoint_name}' created with model '{model_name}'!")
 else:
     # Update existing endpoint with new model
-    predictor = model.deploy(
-        initial_instance_count=1,
-        instance_type="ml.t2.medium",
-        endpoint_name=endpoint_name,
-        update_endpoint=True,
-        endpoint_config_name=endpoint_config_name
+  
+    client = boto3.client('sagemaker')
+    response = client.update_endpoint(
+    EndpointName=endpoint_name,
+    EndpointConfigName= endpoint_config_name
     )
+    print(response)
+    # predictor = model.deploy(
+    #     initial_instance_count=1,
+    #     instance_type="ml.t2.medium",
+    #     endpoint_name=endpoint_name,
+    #     update_endpoint=True,
+    #     endpoint_config_name=endpoint_config_name
+    # )
     print(f"🔄 Endpoint '{endpoint_name}' updated successfully with model '{model_name}'!")
 
     
