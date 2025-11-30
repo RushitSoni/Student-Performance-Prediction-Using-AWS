@@ -41,7 +41,7 @@ jobs:
         run: python ml_model/train.py
       
       - name: Upload model artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: trained-model
           path: ml_model/model/model.joblib  # or include model.tar.gz if you want
@@ -67,7 +67,7 @@ jobs:
           python-version: '3.10'
 
       - name: Download model artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: trained-model
           path: ml_model/model
