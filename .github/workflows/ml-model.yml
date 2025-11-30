@@ -84,6 +84,10 @@ jobs:
           TEST_RESULT=$(tail -n 1 result.txt)
           echo "TEST_RESULT=$TEST_RESULT"
           echo "::set-output name=TEST_RESULT::$TEST_RESULT"
+      
+      - name: Show Test Output
+        run: cat result.txt
+
 
   
   # ----------------------------

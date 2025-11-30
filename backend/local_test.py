@@ -36,7 +36,7 @@ response = sm_client.invoke_endpoint(
     Body=payload
 )
 
-# Read predictions
+# Read predictions 
 result = response["Body"].read().decode("utf-8")
 predictions = json.loads(result)
 
