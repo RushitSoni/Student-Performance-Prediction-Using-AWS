@@ -12,23 +12,23 @@ jobs:
     
 
     steps:
-      # 1️⃣ Checkout repo
+      # 1️ Checkout repo
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # 2️⃣ Setup Python
+      # 2️ Setup Python
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      # 3️⃣ Install dependencies
+      # 3️ Install dependencies
       - name: Install dependencies
         run: |
           pip install -r ml_model/requirements.txt
           pip install boto3 sagemaker pandas numpy scikit-learn
 
-      # 4️⃣ Configure AWS credentials (for both training & deployment)
+      # 4️ Configure AWS credentials (for both training & deployment)
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -36,7 +36,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # 5️⃣ Train Model
+      # 5️ Train Model
       - name: Train Model
         run: python ml_model/train.py
       
@@ -48,7 +48,7 @@ jobs:
 
 
  # ----------------------------
-  # 2️⃣ TEST MODEL
+  # 2️ TEST MODEL
   # ----------------------------
   test:
     runs-on: ubuntu-latest
@@ -91,7 +91,7 @@ jobs:
 
   
   # ----------------------------
-  # 3️⃣ DEPLOY MODEL
+  # 3️ DEPLOY MODEL
   # ----------------------------
   deploy:
     runs-on: ubuntu-latest
@@ -126,9 +126,9 @@ jobs:
         run: |
           python ml_model/deploy_sagemaker.py
 
-  # ----------------------------
+  
   # NOTIFY FAILURE IF TEST FAILS
-  # ----------------------------
+
   notify_failure:
     runs-on: ubuntu-latest
     needs: test
@@ -138,18 +138,4 @@ jobs:
         run: echo "❌ Model test failed. Deployment skipped."
 
 
-      # # 7️⃣ Deploy if test passed
-      # - name: Deploy to SageMaker
-      #   if: env.TEST_RESULT == 'PASS'
-      #   env:
-      #     SAGEMAKER_ROLE_ARN: ${{ secrets.SAGEMAKER_ROLE_ARN }}
-      #   run: |
-      #     # Upload model to S3
-      #     aws s3 cp ml_model/model/ s3://g30-student-performance-analysis/model/ --recursive
-      #     # Deploy to SageMaker
-      #     python ml_model/deploy_sagemaker.py
-
-      # # 8️⃣ Notify if test failed
-      # - name: Notify Failure
-      #   if: env.TEST_RESULT != 'PASS'
-      #   run: echo "Model test failed. Deployment skipped."
+      

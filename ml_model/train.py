@@ -73,33 +73,18 @@ def train_and_save_model():
         raise Exception("tar command failed")
 
 
-    # --- 5. Upload model to S3 ---
+   
 
-    # import tarfile
-
-    # with tarfile.open("model.tar.gz", "w:gz") as tar:
-    #     tar.add(local_model_path, arcname="model.joblib")
-    # import subprocess
-
-    # # command = ["tar", "-czvf", "model.tar.gz", local_model_path]
-    # command = ["tar", "-czvf", "model.tar.gz", "-C", "ml_model/model", "model.joblib"]
-
-
-    # result = subprocess.run(command, capture_output=True, text=True)
-
-    bucket_name = "g30-student-performance-analysis"         # Replace with your bucket
+    bucket_name = "g30-student-performance-analysis"        
     s3_key = "model-artifacts/model.tar.gz"       # Path inside bucket
 
-    #s3 = boto3.client("s3")
     s3 = boto3.client("s3")
 
     print(f"📤 Uploading {tar_path} to s3://{bucket_name}/{s3_key} ...")
     s3.upload_file(tar_path, bucket_name, s3_key)
     print(f"🎉 Model uploaded successfully to s3://{bucket_name}/{s3_key}")
 
-    # print(f"📤 Uploading model to s3://{bucket_name}/{s3_key} ...")
-    # #s3.upload_file(local_model_path, bucket_name, s3_key)
-    # print(f"🎉 Model uploaded successfully to s3://{bucket_name}/{s3_key}")
+    
 
 if __name__ == "__main__":
     train_and_save_model()

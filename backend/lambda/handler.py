@@ -9,7 +9,7 @@ dynamodb = boto3.resource("dynamodb", region_name="ap-southeast-1")
 table = dynamodb.Table("StudentPerformancePredictions")
 
 runtime = boto3.client("sagemaker-runtime", region_name="ap-southeast-1")
-sagemaker_endpoint = "student-performance-model-endpoint"  # Replace with your endpoint
+sagemaker_endpoint = "student-performance-model-endpoint"  
 
 # Helper: Convert floats to Decimal for DynamoDB
 def convert_to_decimal(item):
